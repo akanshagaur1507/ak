@@ -1,0 +1,36 @@
+<DFD>
+    <ExternalEntities>
+        <Entity name="Admin/Teacher">
+            <Description>Manages student information and views attendance reports</Description>
+            <DataFlow>
+                <ToProcess>Student Information</ToProcess>
+            </DataFlow>
+        </Entity>
+        <Entity name="Student">
+            <Description>Provides their face for recognition</Description>
+            <DataFlow>
+                <ToProcess>Face Input</ToProcess>
+            </DataFlow>
+        </Entity>
+    </ExternalEntities>
+
+    <Processes>
+        <Process name="Face Recognition Attendance System">
+            <Description>Captures the student's face and processes attendance</Description>
+            <DataFlow>
+                <FromEntity>Admin/Teacher</FromEntity>
+                <DataType>Student Information</DataType>
+                <ToEntity>Student</ToEntity>
+                <DataType>Face Input</DataType>
+                <ToEntity>Admin/Teacher</ToEntity>
+                <DataType>Attendance Report</DataType>
+            </DataFlow>
+        </Process>
+    </Processes>
+
+    <DataFlows>
+        <Flow from="Admin/Teacher" to="Face Recognition Attendance System" data="Student Information"/>
+        <Flow from="Student" to="Face Recognition Attendance System" data="Face Input"/>
+        <Flow from="Face Recognition Attendance System" to="Admin/Teacher" data="Attendance Report"/>
+    </DataFlows>
+</DFD>
