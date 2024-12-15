@@ -1,0 +1,146 @@
+<DFD>
+    <!-- External Entities -->
+    <ExternalEntities>
+        <Entity name="Admin/Teacher">
+            <Description>Manages student information and views attendance reports</Description>
+            <DataFlow>
+                <ToProcess>Attendance Report</ToProcess>
+            </DataFlow>
+        </Entity>
+        <Entity name="Student">
+            <Description>Provides their face for recognition</Description>
+            <DataFlow>
+                <ToProcess>Captured Image</ToProcess>
+            </DataFlow>
+        </Entity>
+    </ExternalEntities>
+
+    <!-- Processes -->
+    <Processes>
+        <!-- Face Capture -->
+        <Process name="Face Capture">
+            <Description>Captures the student's face via camera</Description>
+            <Inputs>
+                <Input>Live Camera Feed</Input>
+            </Inputs>
+            <Outputs>
+                <Output>Captured Image Data</Output>
+            </Outputs>
+            <DataFlow>
+                <FromEntity>Student</FromEntity>
+                <DataType>Live Camera Feed</DataType>
+                <ToProcess>Face Preprocessing</ToProcess>
+                <DataType>Captured Image Data</DataType>
+            </DataFlow>
+        </Process>
+
+        <!-- Face Preprocessing -->
+        <Process name="Face Preprocessing">
+            <Description>Enhances and normalizes the image for recognition</Description>
+            <Inputs>
+                <Input>Captured Face Image</Input>
+            </Inputs>
+            <Processes>
+                <Process>Cropping</Process>
+                <Process>Alignment</Process>
+                <Process>Scaling</Process>
+                <Process>Filtering</Process>
+            </Processes>
+            <Outputs>
+                <Output>Normalized Face Data</Output>
+            </Outputs>
+            <DataFlow>
+                <FromProcess>Face Capture</FromProcess>
+                <DataType>Captured Image Data</DataType>
+                <ToProcess>Face Recognition</ToProcess>
+                <DataType>Normalized Face Data</DataType>
+            </DataFlow>
+        </Process>
+
+        <!-- Face Recognition -->
+        <Process name="Face Recognition">
+            <Description>Matches the student's face against stored student data</Description>
+            <Inputs>
+                <Input>Normalized Face Data</Input>
+                <Input>Student Database</Input>
+            </Inputs>
+            <Processes>
+                <Process>Extract Facial Features</Process>
+                <Process>Match With Stored Profiles</Process>
+            </Processes>
+            <Outputs>
+                <Output>Recognition Result</Output>
+            </Outputs>
+            <DataFlow>
+                <FromProcess>Face Preprocessing</FromProcess>
+                <DataType>Normalized Face Data</DataType>
+                <FromEntity>Student Database</FromEntity>
+                <DataType>Student Profile Data</DataType>
+                <ToProcess>Attendance Logging</ToProcess>
+                <DataType>Recognition Result</DataType>
+            </DataFlow>
+        </Process>
+
+        <!-- Attendance Logging -->
+        <Process name="Attendance Logging">
+            <Description>Records the student's attendance in the database</Description>
+            <Inputs>
+                <Input>Recognition Result</Input>
+                <Input>Student ID</Input>
+                <Input>Class Schedule</Input>
+            </Inputs>
+            <Processes>
+                <Process>Update Attendance Log</Process>
+            </Processes>
+            <Outputs>
+                <Output>Attendance Record</Output>
+            </Outputs>
+            <DataFlow>
+                <FromProcess>Face Recognition</FromProcess>
+                <DataType>Recognition Result</DataType>
+                <FromEntity>Class Schedule Database</FromEntity>
+                <DataType>Class Schedule</DataType>
+                <ToProcess>Report Generation</ToProcess>
+                <DataType>Attendance Record</DataType>
+            </DataFlow>
+        </Process>
+
+        <!-- Report Generation -->
+        <Process name="Report Generation">
+            <Description>Generates attendance reports for teachers/admin</Description>
+            <Inputs>
+                <Input>Attendance Logs</Input>
+            </Inputs>
+            <Processes>
+                <Process>Summarize Attendance</Process>
+            </Processes>
+            <Outputs>
+                <Output>Attendance Report</Output>
+            </Outputs>
+            <DataFlow>
+                <FromProcess>Attendance Logging</FromProcess>
+                <DataType>Attendance Record</DataType>
+                <ToEntity>Admin/Teacher</ToEntity>
+                <DataType>Attendance Report</DataType>
+            </DataFlow>
+        </Process>
+    </Processes>
+
+    <!-- Data Flows -->
+    <DataFlows>
+        <!-- External Entity to Processes -->
+        <Flow from="Student" to="Face Capture" data="Live Camera Feed"/>
+        <Flow from="Admin/Teacher" to="Report Generation" data="Attendance Report"/>
+        
+        <!-- Processes Data Flow -->
+        <Flow from="Face Capture" to="Face Preprocessing" data="Captured Image Data"/>
+        <Flow from="Face Preprocessing" to="Face Recognition" data="Normalized Face Data"/>
+        <Flow from="Face Recognition" to="Attendance Logging" data="Recognition Result"/>
+        <Flow from="Attendance Logging" to="Report Generation" data="Attendance Record"/>
+        
+        <!-- External Entity to Data Flows -->
+        <Flow from="Class Schedule Database" to="Attendance Logging" data="Class Schedule"/>
+        <Flow from="Student Database" to="Face Recognition" data="Student Profile Data"/>
+        <Flow from="Report Generation" to="Admin/Teacher" data="Attendance Report"/>
+    </DataFlows>
+</DFD
