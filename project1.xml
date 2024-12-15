@@ -1,0 +1,99 @@
+<DFD>
+    <!-- External Entities -->
+    <ExternalEntities>
+        <Entity name="Student">
+            <Description>Provides their face for recognition</Description>
+            <DataFlow>
+                <ToProcess>Captured Image</ToProcess>
+            </DataFlow>
+        </Entity>
+        <Entity name="Admin/Teacher">
+            <Description>Views attendance reports</Description>
+            <DataFlow>
+                <ToProcess>Attendance Reports</ToProcess>
+            </DataFlow>
+        </Entity>
+    </ExternalEntities>
+
+    <!-- Processes -->
+    <Processes>
+        <Process name="Face Capture">
+            <Description>Captures the student's image via camera</Description>
+            <DataFlow>
+                <FromEntity>Student</FromEntity>
+                <DataType>Captured Image</DataType>
+                <ToEntity>Face Preprocessing</ToEntity>
+                <DataType>Captured Image</DataType>
+            </DataFlow>
+        </Process>
+
+        <Process name="Face Preprocessing">
+            <Description>Enhances and normalizes the image for recognition</Description>
+            <DataFlow>
+                <FromEntity>Face Capture</FromEntity>
+                <DataType>Captured Image</DataType>
+                <ToEntity>Face Recognition</ToEntity>
+                <DataType>Preprocessed Face Data</DataType>
+            </DataFlow>
+        </Process>
+
+        <Process name="Face Recognition">
+            <Description>Matches the student's face against stored student data</Description>
+            <DataFlow>
+                <FromEntity>Face Preprocessing</FromEntity>
+                <DataType>Preprocessed Face Data</DataType>
+                <FromEntity>Student Database</FromEntity>
+                <DataType>Student Data</DataType>
+                <ToEntity>Attendance Logging</ToEntity>
+                <DataType>Recognition Status</DataType>
+            </DataFlow>
+        </Process>
+
+        <Process name="Attendance Logging">
+            <Description>Records the student's attendance in the database</Description>
+            <DataFlow>
+                <FromEntity>Face Recognition</FromEntity>
+                <DataType>Recognition Status</DataType>
+                <ToEntity>Attendance Records</ToEntity>
+                <DataType>Attendance Logs</DataType>
+                <ToEntity>Report Generation</ToEntity>
+                <DataType>Attendance Logs</DataType>
+            </DataFlow>
+        </Process>
+
+        <Process name="Report Generation">
+            <Description>Generates attendance reports for teachers/admin</Description>
+            <DataFlow>
+                <FromEntity>Attendance Logging</FromEntity>
+                <DataType>Attendance Logs</DataType>
+                <ToEntity>Admin/Teacher</ToEntity>
+                <DataType>Attendance Reports</DataType>
+            </DataFlow>
+        </Process>
+    </Processes>
+
+    <!-- Data Stores -->
+    <DataStores>
+        <DataStore name="Student Database">
+            <Description>Contains student profiles, including photos and IDs</Description>
+        </DataStore>
+        <DataStore name="Attendance Records">
+            <Description>Logs attendance for each class session</Description>
+        </DataStore>
+        <DataStore name="Class Schedule Database">
+            <Description>Stores details of class times and assigned students</Description>
+        </DataStore>
+    </DataStores>
+
+    <!-- Data Flows -->
+    <DataFlows>
+        <Flow from="Student" to="Face Capture" data="Captured Image"/>
+        <Flow from="Face Capture" to="Face Preprocessing" data="Captured Image"/>
+        <Flow from="Face Preprocessing" to="Face Recognition" data="Preprocessed Face Data"/>
+        <Flow from="Student Database" to="Face Recognition" data="Student Data"/>
+        <Flow from="Face Recognition" to="Attendance Logging" data="Recognition Status"/>
+        <Flow from="Attendance Logging" to="Attendance Records" data="Attendance Logs"/>
+        <Flow from="Attendance Logging" to="Report Generation" data="Attendance Logs"/>
+        <Flow from="Report Generation" to="Admin/Teacher" data="Attendance Reports"/>
+    </DataFlows>
+</DFD>
